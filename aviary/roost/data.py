@@ -91,7 +91,7 @@ class CompositionData(Dataset):
         composition = row[self.inputs]
         material_ids = row[self.identifiers].to_list()
 
-        comp_dict = Composition(composition).get_el_amt_dict()
+        comp_dict = Composition(composition).as_dict()
         elements = list(comp_dict)
 
         weights = list(comp_dict.values())
