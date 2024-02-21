@@ -256,6 +256,10 @@ class BaseModelClass(nn.Module, ABC):
         for inputs, targets_list, *_ in tqdm(
             data_loader, disable=None if pbar else True
         ):
+            # Move data to device
+            device = next(self.parameters()).device
+            inputs = tuple(x.to(device) for x in inputs)
+            targets_list = [x.to(device) for x in targets_list]
             # compute output
             outputs = self(*inputs)
 
@@ -370,6 +374,10 @@ class BaseModelClass(nn.Module, ABC):
         for inputs, targets, *batch_ids in tqdm(
             data_loader, disable=True if not verbose else None
         ):
+            # Move data to device
+            device = next(self.parameters()).device
+            inputs = tuple(x.to(device) for x in inputs)
+            targets = [x.to(device) for x in targets]
             preds = self(*inputs)  # forward pass to get model preds
 
             test_ids.append(batch_ids)
