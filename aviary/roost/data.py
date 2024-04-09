@@ -25,6 +25,7 @@ class CompositionData(Dataset):
         task_dict: dict[str, str],
         elem_embedding: str = "matscholar200",
         inputs: str = "composition",
+        species_mode=False,
         identifiers: Sequence[str] = ("material_id", "composition"),
     ):
         """Data class for Roost models.
@@ -38,6 +39,8 @@ class CompositionData(Dataset):
                 embeddings. Defaults to "matscholar200".
             inputs (str, optional): df column name holding material compositions.
                 Defaults to "composition".
+            species_mode (bool, optional): Whether to allow flexibility to consider
+                species in the composition. Defaults to False.
             identifiers (list, optional): df columns for distinguishing data points.
                 Will be copied over into the model's output CSV. Defaults to
                 ["material_id", "composition"].
@@ -47,6 +50,7 @@ class CompositionData(Dataset):
 
         self.inputs = inputs
         self.task_dict = task_dict
+        self.species_mode = species_mode
         self.identifiers = list(identifiers)
         self.df = df
 
@@ -91,7 +95,10 @@ class CompositionData(Dataset):
         composition = row[self.inputs]
         material_ids = row[self.identifiers].to_list()
 
-        comp_dict = Composition(composition).as_dict()
+        if self.species_mode:
+            comp_dict = Composition(composition).as_dict()
+        else:
+            comp_dict = Composition(composition).get_el_amt_dict()
         elements = list(comp_dict)
 
         weights = list(comp_dict.values())
